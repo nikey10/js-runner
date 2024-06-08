@@ -7,45 +7,36 @@ const rl = readline.createInterface({
 
 const choices = ['rock', 'paper', 'scissors'];
 
-function getComputerChoice() {
-  const randomIndex = Math.floor(Math.random() * choices.length);
-  return choices[randomIndex];
-}
-
 function determineWinner(userChoice, computerChoice) {
   if (userChoice === computerChoice) {
-    return "It's a tie!";
+    return "  Win: Tie";
   }
   if ((userChoice === 'rock' && computerChoice === 'scissors') ||
       (userChoice === 'scissors' && computerChoice === 'paper') ||
       (userChoice === 'paper' && computerChoice === 'rock')) {
-    return "You win!";
+    return "  Win: You";
   }
-  return "Computer wins!";
+  return "  Win: Com";
 }
 
 function playGame() {
-  rl.question('Choose rock, paper or scissors (or type "exit" to quit): ', (answer) => {
-    const userChoice = answer.toLowerCase();
+  rl.question('[rock|paper|scissors|exit]: ', (userChoice) => {
+    userChoice = userChoice.toLowerCase();
     if (userChoice === "exit") {
-      console.log("Thanks for playing!");
       rl.close();
       return;
     }
-
-    const computerChoice = getComputerChoice();
     if (!choices.includes(userChoice)) {
-      console.log('Invalid choice!');
-      playGame(); // Ask again
+      console.log('  Invalid');
+      playGame();
       return;
     }
-
-    console.log('You chose ' + userChoice);
-    console.log('Computer chose ' + computerChoice);
+    const computerChoice = choices[Math.floor(Math.random() * choices.length)];;
+    console.log(`  You: ${userChoice}`);
+    console.log(`  Com: ${computerChoice}`);
     console.log(determineWinner(userChoice, computerChoice));
-
-    playGame(); // Ask to play again
+    playGame();
   });
 }
 
-playGame(); // Start the game
+playGame();
