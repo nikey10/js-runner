@@ -1,42 +1,28 @@
-const readline = require('readline');
+const choices = ['rock', 'paper', 'scissors', 'exit'];
 
-const rl = readline.createInterface({
-  input: process.stdin,
-  output: process.stdout
-});
-
-const choices = ['rock', 'paper', 'scissors'];
-
-function determineWinner(userChoice, computerChoice) {
-  if (userChoice === computerChoice) {
-    return "  Win: Tie";
-  }
-  if ((userChoice === 'rock' && computerChoice === 'scissors') ||
-      (userChoice === 'scissors' && computerChoice === 'paper') ||
-      (userChoice === 'paper' && computerChoice === 'rock')) {
-    return "  Win: You";
-  }
-  return "  Win: Com";
+function promptUser() {
+  process.stdout.write(`Choose ${choices.join("|")}: `);
 }
 
-function playGame() {
-  rl.question('[rock|paper|scissors|exit]: ', (userChoice) => {
-    userChoice = userChoice.toLowerCase();
-    if (userChoice === "exit") {
-      rl.close();
-      return;
-    }
-    if (!choices.includes(userChoice)) {
-      console.log('  Invalid');
-      playGame();
-      return;
-    }
-    const computerChoice = choices[Math.floor(Math.random() * choices.length)];;
+const handleInput = (data) => {
+  const userChoice = data.toString().trim().toLowerCase();
+  if (userChoice === "exit") {
+    process.exit();
+  }
+  if (!choices.includes(userChoice)) {
+    console.log('  Invalid');
+  } else {
+    const computerChoice = choices[Math.floor(Math.random() * choices.length)];
+    const winner = (userChoice === computerChoice) ? "Tie" :
+                    ((userChoice === 'rock' && computerChoice === 'scissors') ||
+                    (userChoice === 'scissors' && computerChoice === 'paper') ||
+                    (userChoice === 'paper' && computerChoice === 'rock') ? "You" : "Com");
     console.log(`  You: ${userChoice}`);
     console.log(`  Com: ${computerChoice}`);
-    console.log(determineWinner(userChoice, computerChoice));
-    playGame();
-  });
-}
+    console.log(`  Win: ${winner}`);
+  }
+  promptUser();
+};
 
-playGame();
+promptUser();
+process.stdin.on('data', handleInput);
