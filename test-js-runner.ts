@@ -10,19 +10,19 @@ const jsRunner = new JsRunner(gameScript, inputBuffer, outputBuffer);
 // Example of interaction
 jsRunner.simulateInput("rock");
 
-jsRunner.delay(3000)
+jsRunner.delay(2000)
   .then(() => {
     jsRunner.simulateInput("paper");
-    return jsRunner.delay(3000);
+    return jsRunner.delay(2000);
   })
   .then(() => {
     jsRunner.simulateInput("scissors");
-    return jsRunner.delay(3000);
+    return jsRunner.delay(2000);
+  })
+  .then(() => {
+    jsRunner.simulateInput("unknown");
+    return jsRunner.delay(2000);
   })
   .then(() => {
     jsRunner.simulateInput("exit");
-    return jsRunner.delay(3000);
   })
-  .then(() => {
-    console.log(jsRunner.getOutputBuffer().join('\n'));
-  });

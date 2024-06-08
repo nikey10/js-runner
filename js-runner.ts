@@ -11,7 +11,7 @@ class MyBufferedReadable extends Readable {
     this.inputBuffer = inputBuffer;
   }
 
-  read(size: number): void {
+  _read(size: number): void {
     this._continueReading = true;
     this.checkBufferAndPush();
   }
@@ -75,7 +75,7 @@ export class JsRunner {
       console: customConsole,
       process: {
         stdin: this.stdin,
-        stdout: this.stdout
+        stdout: this.stdout,
       },
     };
 
