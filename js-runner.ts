@@ -1,6 +1,5 @@
 import { Script, createContext } from 'vm';
 import { Readable, Writable } from 'stream';
-import { Console } from 'console';
 
 // Custom readable stream for buffered input
 class MyBufferedReadable extends Readable {
@@ -12,7 +11,7 @@ class MyBufferedReadable extends Readable {
     this.inputBuffer = inputBuffer;
   }
 
-  _read(size: number): void {
+  read(size: number): void {
     this._continueReading = true;
     this.checkBufferAndPush();
   }
@@ -51,9 +50,9 @@ class MyBufferedWritable extends Writable {
 }
 
 export class JsRunner {
-  private myStdin: MyBufferedReadable;
-  private myStdout: MyBufferedWritable;
-  private customConsole: Console;
+  private stdin: MyBufferedReadable;
+  private stdout: MyBufferedWritable;
+  // private customConsole: Console;
   private context: any;
   private inputBuffer: string[];
   private outputBuffer: string[];
@@ -61,17 +60,23 @@ export class JsRunner {
   constructor(gameScript: string, inputBuffer: string[], outputBuffer: string[]) {
     this.inputBuffer = inputBuffer;
     this.outputBuffer = outputBuffer;
-    this.myStdin = new MyBufferedReadable(this.inputBuffer);
-    this.myStdout = new MyBufferedWritable(this.outputBuffer);
+    this.stdin = new MyBufferedReadable(this.inputBuffer);
+    this.stdout = new MyBufferedWritable(this.outputBuffer);
 
-    // Custom console that redirects all output to myStdout
-    this.customConsole = new Console(this.myStdout, this.myStdout);
+    const customConsole = {
+      log: (message?: any, ...optionalParams: any[]) => {
+        const allParams = [message, ...optionalParams].map(param => String(param));
+        this.stdout.write(allParams.join(' ') + '\n');
+      }
+    };
 
     // Set up the VM context with the custom console
     const sandbox: { [key: string]: any } = {
-      console: this.customConsole,
-      require: require,
-      process: { stdin: this.myStdin, stdout: this.myStdout },
+      console: customConsole,
+      process: {
+        stdin: this.stdin,
+        stdout: this.stdout
+      },
     };
 
     this.context = createContext(sandbox);
@@ -84,7 +89,7 @@ export class JsRunner {
   // Function to simulate input externally
   simulateInput(input: string) {
     this.inputBuffer.push(input);
-    this.myStdin.continueReading();
+    this.stdin.continueReading();
   }
 
   // Example of how to use simulateInput
